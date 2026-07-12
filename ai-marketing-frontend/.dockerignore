@@ -1,0 +1,31 @@
+# Files / dirs not needed inside the frontend Docker image.
+
+.git
+.gitignore
+.gitattributes
+
+node_modules
+.angular
+dist
+
+# Editor / IDE
+.vscode
+.idea
+.history
+.cursor
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# The leftover manual-test script (has a real Telegram token in it!)
+telegram.js.deletethislater
+
+# The SSR leftover that isn't used in this build
+server.ts

@@ -1,0 +1,36 @@
+<div class="glass-card p-6">
+  <div class="mb-6 flex items-center gap-3">
+    <div class="h-10 w-10 animate-pulse-soft rounded-full bg-gradient-to-br from-brand to-purple-600"></div>
+    <div>
+      <p class="font-semibold text-white">AI is crafting your campaign</p>
+      <p class="text-sm text-slate-400">~{{ remaining() }}s remaining</p>
+    </div>
+  </div>
+
+  <div class="mb-6 h-1.5 overflow-hidden rounded-full bg-surface-4">
+    <div
+      class="h-full rounded-full bg-gradient-to-r from-brand to-purple-500 transition-all duration-500"
+      [style.width.%]="progress()"
+    ></div>
+  </div>
+
+  <ul class="space-y-3">
+    @for (step of steps(); track step.label) {
+      <li class="flex items-center gap-3 text-sm">
+        <span
+          class="material-icons text-lg"
+          [ngClass]="step.done ? 'text-emerald-400' : 'animate-pulse-soft text-slate-500'"
+        >
+          {{ step.done ? 'check_circle' : 'radio_button_unchecked' }}
+        </span>
+        <span [ngClass]="step.done ? 'text-slate-200' : 'text-slate-500'">{{ step.label }}</span>
+      </li>
+    }
+  </ul>
+
+  <div class="mt-6 grid gap-3">
+    @for (i of [1, 2, 3]; track i) {
+      <div class="h-20 animate-pulse rounded-xl bg-surface-3/80"></div>
+    }
+  </div>
+</div>

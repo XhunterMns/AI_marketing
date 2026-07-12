@@ -1,0 +1,182 @@
+<div class="page-container animate-fade-in">
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-white sm:text-3xl">Competitor Analysis</h1>
+    <p class="mt-1 text-slate-400">Deep AI-powered insights into your competitive landscape</p>
+  </div>
+
+  <div class="glass-panel mb-6 p-6">
+    <form [formGroup]="form" (ngSubmit)="analyze()" class="flex flex-col gap-4 sm:flex-row sm:items-end">
+      <div class="flex-1">
+        <label class="label-field" for="companyName">Company Name</label>
+        <input id="companyName" class="input-field" formControlName="companyName" placeholder="Nike, HubSpot..." />
+      </div>
+      <div class="flex-1">
+        <label class="label-field" for="websiteUrl">Website URL</label>
+        <input id="websiteUrl" class="input-field" formControlName="websiteUrl" placeholder="https://competitor.com" />
+      </div>
+      <button type="submit" class="btn-primary shrink-0 !px-8" [disabled]="loading()">
+        <span class="material-icons">search</span>
+        Analyze
+      </button>
+    </form>
+  </div>
+
+  @if (loading()) {
+    <app-ai-thinking-loader />
+  } @else if (!result()) {
+    <app-empty-state
+      icon="analytics"
+      title="No analysis yet"
+      description="Enter a competitor name or website URL above to generate a comprehensive analysis."
+    />
+  } @else {
+    <div class="grid gap-4 md:grid-cols-2">
+      @if (result()!.summary || result()!.companyOverview) {
+        <div class="glass-card md:col-span-2 p-5">
+          <h3 class="mb-3 flex items-center gap-2 font-semibold text-white">
+            <span class="material-icons text-brand">business</span> Company Overview
+          </h3>
+          <p class="text-sm leading-relaxed text-slate-300">{{ result()!.companyOverview || result()!.summary }}</p>
+        </div>
+      }
+
+      @if (result()!.seoSummary) {
+        <div class="glass-card p-5">
+          <h3 class="mb-3 flex items-center gap-2 font-semibold text-white">
+            <span class="material-icons text-brand">search</span> SEO Summary
+          </h3>
+          <p class="text-sm text-slate-300">{{ result()!.seoSummary }}</p>
+        </div>
+      }
+
+      @if (result()!.marketingStrategy) {
+        <div class="glass-card p-5">
+          <h3 class="mb-3 flex items-center gap-2 font-semibold text-white">
+            <span class="material-icons text-brand">campaign</span> Marketing Strategy
+          </h3>
+          <p class="text-sm text-slate-300">{{ result()!.marketingStrategy }}</p>
+        </div>
+      }
+
+      @if (result()!.socialPresence) {
+        <div class="glass-card p-5">
+          <h3 class="mb-3 flex items-center gap-2 font-semibold text-white">
+            <span class="material-icons text-brand">share</span> Social Presence
+          </h3>
+          <p class="text-sm text-slate-300">{{ result()!.socialPresence }}</p>
+        </div>
+      }
+
+      @if (result()!.strengths?.length) {
+        <div class="glass-card p-5">
+          <h3 class="mb-3 flex items-center gap-2 font-semibold text-emerald-400">
+            <span class="material-icons">trending_up</span> Strengths
+          </h3>
+          <ul class="space-y-2">
+            @for (s of result()!.strengths; track s) {
+              <li class="flex items-start gap-2 text-sm text-slate-300">
+                <span class="mt-1.5 h-1.5 w-1.5 rounded-full bg-emerald-400"></span>{{ s }}
+              </li>
+            }
+          </ul>
+        </div>
+      }
+
+      @if (result()!.weaknesses?.length) {
+        <div class="glass-card p-5">
+          <h3 class="mb-3 flex items-center gap-2 font-semibold text-rose-400">
+            <span class="material-icons">trending_down</span> Weaknesses
+          </h3>
+          <ul class="space-y-2">
+            @for (w of result()!.weaknesses; track w) {
+              <li class="flex items-start gap-2 text-sm text-slate-300">
+                <span class="mt-1.5 h-1.5 w-1.5 rounded-full bg-rose-400"></span>{{ w }}
+              </li>
+            }
+          </ul>
+        </div>
+      }
+
+      @if (result()!.swot) {
+        <div class="glass-card md:col-span-2 p-5">
+          <h3 class="mb-4 font-semibold text-white">SWOT Analysis</h3>
+          <div class="grid gap-4 sm:grid-cols-2">
+            @for (entry of [
+              { label: 'Strengths', items: result()!.swot!.strengths, color: 'emerald' },
+              { label: 'Weaknesses', items: result()!.swot!.weaknesses, color: 'rose' },
+              { label: 'Opportunities', items: result()!.swot!.opportunities, color: 'brand' },
+              { label: 'Threats', items: result()!.swot!.threats, color: 'amber' }
+            ]; track entry.label) {
+              <div class="rounded-xl bg-surface-3/50 p-4">
+                <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-400">{{ entry.label }}</p>
+                <ul class="space-y-1">
+                  @for (item of entry.items; track item) {
+                    <li class="text-sm text-slate-300">• {{ item }}</li>
+                  }
+                </ul>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      @if (result()!.competitors?.length) {
+        <div class="glass-card md:col-span-2 p-5">
+          <h3 class="mb-4 font-semibold text-white">Competitors</h3>
+          <div class="grid gap-3 sm:grid-cols-2">
+            @for (c of result()!.competitors; track c.name) {
+              <div class="rounded-xl border border-white/[0.06] bg-surface-3/40 p-4">
+                <p class="mb-2 font-medium text-white">{{ c.name }}</p>
+                <p class="text-xs text-emerald-400">+ {{ c.strengths.join(', ') }}</p>
+                <p class="mt-1 text-xs text-rose-400">− {{ c.weaknesses.join(', ') }}</p>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      @if (result()!.trends?.length) {
+        <div class="glass-card md:col-span-2 p-5">
+          <h3 class="mb-4 font-semibold text-white">Market Trends</h3>
+          <div class="flex flex-wrap gap-2">
+            @for (t of result()!.trends; track t.title) {
+              <span class="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm" [ngClass]="importanceClass(t.importance)">
+                {{ t.title }}
+              </span>
+            }
+          </div>
+        </div>
+      }
+
+      @if (result()!.recommendations?.length) {
+        <div class="glass-card md:col-span-2 p-5">
+          <h3 class="mb-3 flex items-center gap-2 font-semibold text-white">
+            <span class="material-icons text-brand">lightbulb</span> AI Recommendations
+          </h3>
+          <ul class="space-y-2">
+            @for (r of result()!.recommendations; track r) {
+              <li class="rounded-lg bg-brand/5 px-4 py-3 text-sm text-slate-300">{{ r }}</li>
+            }
+          </ul>
+        </div>
+      }
+
+      @if (result()!.aiOpportunities?.length) {
+        <div class="glass-card md:col-span-2 p-5">
+          <h3 class="mb-3 font-semibold text-white">AI Opportunities</h3>
+          <ul class="space-y-2">
+            @for (o of result()!.aiOpportunities; track o) {
+              <li class="text-sm text-slate-300">✦ {{ o }}</li>
+            }
+          </ul>
+        </div>
+      }
+
+      @if (result()!.raw && !result()!.summary) {
+        <div class="glass-card md:col-span-2 p-5">
+          <pre class="whitespace-pre-wrap text-sm text-slate-300">{{ result()!.raw }}</pre>
+        </div>
+      }
+    </div>
+  }
+</div>

@@ -1,0 +1,9 @@
+.nav-active {
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+  box-shadow: inset 3px 0 0 #3b82f6;
+}
+
+.nav-link.nav-active .material-icons {
+  color: #3b82f6;
+}

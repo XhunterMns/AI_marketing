@@ -1,0 +1,68 @@
+<div class="page-container animate-fade-in">
+  <div class="mb-8">
+    <h1 class="text-2xl font-bold text-white sm:text-3xl">Dashboard</h1>
+    <p class="mt-1 text-slate-400">Overview of your AI marketing performance</p>
+  </div>
+
+  <div class="mb-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <app-stat-card icon="campaign" label="Campaigns Generated" [value]="stats().campaignsGenerated" trend="+12%" />
+    <app-stat-card icon="analytics" label="Competitor Reports" [value]="stats().competitorReports" trend="+8%" />
+    <app-stat-card icon="psychology" label="AI Requests" [value]="stats().aiRequests" trend="+24%" />
+    <app-stat-card icon="trending_up" label="Success Rate" [value]="stats().successRate + '%'" trend="+2%" />
+  </div>
+
+  <div class="grid gap-6 lg:grid-cols-3">
+    <div class="glass-card lg:col-span-2 p-6">
+      <h2 class="mb-4 text-lg font-semibold text-white">Activity Timeline</h2>
+      @if (activity().length === 0) {
+        <p class="text-sm text-slate-500">No recent activity. Generate a campaign to get started.</p>
+      } @else {
+        <ul class="space-y-4">
+          @for (item of activity(); track item.id) {
+            <li class="flex items-start gap-3 border-l-2 border-brand/30 pl-4">
+              <span class="material-icons mt-0.5 text-brand text-lg">
+                {{ item.type === 'campaign' ? 'campaign' : 'analytics' }}
+              </span>
+              <div>
+                <p class="text-sm font-medium text-slate-200">{{ item.title }}</p>
+                <p class="text-xs text-slate-500">{{ item.timestamp | date: 'medium' }}</p>
+              </div>
+            </li>
+          }
+        </ul>
+      }
+    </div>
+
+    <div class="glass-card p-6">
+      <h2 class="mb-4 text-lg font-semibold text-white">Quick Actions</h2>
+      <div class="space-y-2">
+        <a routerLink="/campaign" class="quick-action">
+          <span class="material-icons">add_circle</span>
+          New Campaign
+        </a>
+        <a routerLink="/competitors" class="quick-action">
+          <span class="material-icons">search</span>
+          Analyze Competitor
+        </a>
+        <a routerLink="/history" class="quick-action">
+          <span class="material-icons">history</span>
+          View History
+        </a>
+      </div>
+    </div>
+  </div>
+
+  @if (history.length) {
+    <div class="mt-6 glass-card p-6">
+      <h2 class="mb-4 text-lg font-semibold text-white">Recent Campaigns</h2>
+      <div class="space-y-3">
+        @for (item of history; track item.id) {
+          <div class="rounded-xl border border-white/[0.06] bg-surface-3/50 p-4">
+            <p class="font-medium text-slate-200">{{ item.title }}</p>
+            <p class="mt-1 line-clamp-2 text-sm text-slate-500">{{ item.preview }}</p>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>

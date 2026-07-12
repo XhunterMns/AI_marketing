@@ -1,0 +1,14 @@
+<div class="flex h-screen overflow-hidden bg-surface">
+  <app-sidebar
+    [collapsed]="sidebarCollapsed()"
+    (toggleCollapse)="toggleSidebar()"
+  />
+
+  <div class="flex min-w-0 flex-1 flex-col">
+    <app-top-nav (menuToggle)="toggleSidebar()" />
+
+    <main class="flex-1 overflow-y-auto">
+      <router-outlet />
+    </main>
+  </div>
+</div>

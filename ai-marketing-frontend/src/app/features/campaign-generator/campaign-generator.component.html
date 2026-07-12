@@ -1,0 +1,272 @@
+<div class="page-container animate-fade-in">
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-white sm:text-3xl">Campaign Generator</h1>
+    <p class="mt-1 text-slate-400">Configure your campaign and let AI build a complete marketing strategy</p>
+  </div>
+
+  <div class="grid gap-6 xl:grid-cols-2">
+    <!-- Left: Configuration -->
+    <div class="glass-panel p-6">
+      <h2 class="mb-5 flex items-center gap-2 text-lg font-semibold text-white">
+        <span class="material-icons text-brand">tune</span>
+        Campaign Configuration
+      </h2>
+
+      <form [formGroup]="form" (ngSubmit)="generate()" class="space-y-4">
+        <div class="grid gap-4 sm:grid-cols-2">
+          <div class="sm:col-span-2">
+            <label class="label-field" for="businessName">Business Name *</label>
+            <input id="businessName" class="input-field" formControlName="businessName" placeholder="Acme Corp" />
+          </div>
+
+          <div class="sm:col-span-2">
+            <label class="label-field" for="businessDescription">Business Description</label>
+            <input id="businessDescription" class="input-field" formControlName="businessDescription" placeholder="What does your business do?" />
+          </div>
+
+          <div>
+            <label class="label-field" for="industry">Industry *</label>
+            <input id="industry" class="input-field" formControlName="industry" placeholder="SaaS, Fashion, Food..." />
+          </div>
+
+          <div>
+            <label class="label-field" for="targetAudience">Target Audience *</label>
+            <input id="targetAudience" class="input-field" formControlName="targetAudience" placeholder="Young professionals, 25-35" />
+          </div>
+
+          <div>
+            <label class="label-field" for="goal">Campaign Goal *</label>
+            <input id="goal" class="input-field" formControlName="goal" placeholder="Increase sign-ups by 30%" />
+          </div>
+
+          <div>
+            <label class="label-field" for="tone">Preferred Tone *</label>
+            <select id="tone" class="input-field" formControlName="tone">
+              @for (t of tones; track t) {
+                <option [value]="t">{{ t }}</option>
+              }
+            </select>
+          </div>
+
+          <div>
+            <label class="label-field" for="language">Language *</label>
+            <select id="language" class="input-field" formControlName="language">
+              @for (l of languages; track l) {
+                <option [value]="l">{{ l }}</option>
+              }
+            </select>
+          </div>
+
+          <div>
+            <label class="label-field" for="platform">Marketing Platform *</label>
+            <select id="platform" class="input-field" formControlName="platform">
+              @for (p of platforms; track p) {
+                <option [value]="p">{{ p }}</option>
+              }
+            </select>
+          </div>
+
+          <div>
+            <label class="label-field" for="campaignType">Campaign Type *</label>
+            <select id="campaignType" class="input-field" formControlName="campaignType">
+              @for (c of campaignTypes; track c) {
+                <option [value]="c">{{ c }}</option>
+              }
+            </select>
+          </div>
+
+          <div>
+            <label class="label-field" for="duration">Campaign Duration</label>
+            <select id="duration" class="input-field" formControlName="duration">
+              @for (d of durations; track d) {
+                <option [value]="d">{{ d }}</option>
+              }
+            </select>
+          </div>
+
+          <div>
+            <label class="label-field" for="budget">Budget (optional)</label>
+            <input id="budget" class="input-field" formControlName="budget" placeholder="$5,000" />
+          </div>
+        </div>
+
+        <div>
+          <label class="label-field" for="prompt">Describe your campaign *</label>
+          <textarea
+            id="prompt"
+            class="input-field min-h-[140px] resize-y"
+            formControlName="prompt"
+            placeholder="Example: Launch a 2-week campaign for our new fitness app targeting busy professionals. Focus on morning workouts and habit building..."
+          ></textarea>
+          <p class="mt-1 text-xs text-slate-500">Minimum 20 characters. Be specific about goals and messaging.</p>
+        </div>
+
+        <!-- Telegram Delivery -->
+        <div class="rounded-xl border border-white/[0.08] bg-surface-3/40 p-4">
+          <div class="mb-4 flex items-center justify-between">
+            <div>
+              <h3 class="font-medium text-white">Telegram Delivery</h3>
+              <p class="text-xs text-slate-500">Send campaign directly to your Telegram channel</p>
+            </div>
+            <label class="relative inline-flex cursor-pointer items-center">
+              <input type="checkbox" formControlName="telegramEnabled" class="peer sr-only" />
+              <div class="h-6 w-11 rounded-full bg-surface-4 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:bg-white after:transition-all peer-checked:bg-brand peer-checked:after:translate-x-full"></div>
+            </label>
+          </div>
+
+          @if (form.get('telegramEnabled')?.value) {
+            <div class="grid gap-3 sm:grid-cols-2">
+              <div>
+                <label class="label-field" for="telegramBotToken">Bot Token *</label>
+                <input
+                  id="telegramBotToken"
+                  type="password"
+                  class="input-field"
+                  formControlName="telegramBotToken"
+                  placeholder="From @BotFather"
+                  autocomplete="off"
+                />
+              </div>
+              <div>
+                <label class="label-field" for="telegramChannelId">Channel ID *</label>
+                <input
+                  id="telegramChannelId"
+                  class="input-field"
+                  formControlName="telegramChannelId"
+                  placeholder="-100xxxxxxxxxx"
+                />
+              </div>
+            </div>
+            @if (form.errors?.['telegramTokenRequired'] || form.errors?.['telegramChannelRequired']) {
+              <p class="mt-2 text-xs text-rose-400">Bot token and channel ID are required when Telegram is enabled.</p>
+            }
+          }
+        </div>
+
+        <button type="submit" class="btn-primary w-full !py-3" [disabled]="loading()">
+          <span class="material-icons text-lg">auto_awesome</span>
+          {{ loading() ? 'Generating...' : 'Generate Campaign' }}
+        </button>
+      </form>
+    </div>
+
+    <!-- Right: Results -->
+    <div class="space-y-4">
+      <h2 class="flex items-center gap-2 text-lg font-semibold text-white">
+        <span class="material-icons text-brand">insights</span>
+        AI Results
+      </h2>
+
+      @if (loading()) {
+        <app-ai-thinking-loader />
+      } @else if (!result()) {
+        <app-empty-state
+          icon="campaign"
+          title="No campaign generated yet"
+          description="Fill in the configuration form and click Generate Campaign to see AI-powered results here."
+        />
+      } @else {
+        <div class="space-y-4">
+          @if (result()!.title || result()!.overview) {
+            <app-result-section-card
+              title="Campaign Overview"
+              icon="flag"
+              [content]="(result()!.title ? result()!.title + '\n\n' : '') + (result()!.overview || '')"
+              [showTelegram]="!!lastTelegram()"
+              (copy)="copySection((result()!.title || '') + '\n' + (result()!.overview || ''))"
+              (download)="downloadPdf()"
+              (sendTelegram)="sendSectionToTelegram((result()!.title || '') + '\n' + (result()!.overview || ''))"
+            />
+          }
+
+          @if (result()!.strategy) {
+            <app-result-section-card
+              title="Marketing Strategy"
+              icon="track_changes"
+              [content]="result()!.strategy!"
+              [showTelegram]="!!lastTelegram()"
+              (copy)="copySection(result()!.strategy!)"
+              (sendTelegram)="sendSectionToTelegram(result()!.strategy!)"
+            />
+          }
+
+          @if (result()!.socialPosts?.length) {
+            <app-result-section-card
+              title="Social Media Posts"
+              icon="share"
+              [content]="socialPostsText()"
+              [showTelegram]="!!lastTelegram()"
+              (copy)="copySection(socialPostsText())"
+              (sendTelegram)="sendSectionToTelegram(socialPostsText())"
+            />
+          }
+
+          @if (result()!.emailCampaign) {
+            <app-result-section-card
+              title="Email Campaign"
+              icon="email"
+              [content]="result()!.emailCampaign!"
+              [showTelegram]="!!lastTelegram()"
+              (copy)="copySection(result()!.emailCampaign!)"
+              (sendTelegram)="sendSectionToTelegram(result()!.emailCampaign!)"
+            />
+          }
+
+          @if (result()!.hashtags?.length) {
+            <app-result-section-card
+              title="Hashtags"
+              icon="tag"
+              [items]="result()!.hashtags!"
+              (copy)="copySection(result()!.hashtags!.join(' '))"
+            />
+          }
+
+          @if (result()!.contentCalendar?.length) {
+            <app-result-section-card
+              title="Content Calendar"
+              icon="calendar_month"
+              [content]="calendarText()"
+              (copy)="copySection(calendarText())"
+            />
+          }
+
+            <div class="flex flex-wrap gap-3 rounded-xl border border-white/[0.08] bg-surface-3/40 p-4">
+            <button type="button" class="btn-primary" (click)="approveCampaign()">
+              Approve
+            </button>
+            <button type="button" class="btn-secondary" (click)="declineCampaign()">
+              Decline
+            </button>
+          </div>
+
+          @if (result()!.cta) {
+            <app-result-section-card
+              title="Call To Action"
+              icon="ads_click"
+              [content]="result()!.cta!"
+              (copy)="copySection(result()!.cta!)"
+            />
+          }
+
+          @if (result()!.imageSuggestions?.length) {
+            <app-result-section-card
+              title="Image Suggestions"
+              icon="image"
+              [items]="result()!.imageSuggestions!"
+              (copy)="copySection(result()!.imageSuggestions!.join('\n'))"
+            />
+          }
+
+          @if (result()!.kpis?.length) {
+            <app-result-section-card
+              title="KPIs"
+              icon="speed"
+              [content]="kpisText()"
+              (copy)="copySection(kpisText())"
+            />
+          }
+        </div>
+      }
+    </div>
+  </div>
+</div>

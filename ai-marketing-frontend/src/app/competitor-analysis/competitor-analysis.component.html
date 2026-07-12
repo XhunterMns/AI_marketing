@@ -1,0 +1,18 @@
+<textarea
+  [(ngModel)]="prompt"
+  rows="5">
+</textarea>
+
+<button (click)="analyzeCompetitors()">
+  Analyze Competitors
+</button>
+
+<hr>
+
+<div *ngIf="competitorData">
+
+  <pre class="generated-text">{{ competitorData }}</pre>
+
+
+
+</div>

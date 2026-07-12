@@ -1,0 +1,55 @@
+<header class="flex h-16 items-center justify-between gap-4 border-b border-white/[0.06] bg-surface-1/80 px-4 backdrop-blur-xl sm:px-6">
+  <div class="flex min-w-0 items-center gap-3">
+    <button
+      type="button"
+      class="btn-secondary !p-2 lg:hidden"
+      (click)="menuToggle.emit()"
+      aria-label="Toggle menu"
+    >
+      <span class="material-icons text-xl">menu</span>
+    </button>
+
+    <nav class="hidden items-center gap-1 text-sm sm:flex" aria-label="Breadcrumb">
+      @for (crumb of breadcrumbs; track crumb.path; let last = $last) {
+        @if (!last) {
+          <span class="text-slate-500">{{ crumb.label }}</span>
+          <span class="material-icons text-sm text-slate-600">chevron_right</span>
+        } @else {
+          <span class="font-medium text-slate-200">{{ crumb.label }}</span>
+        }
+      }
+    </nav>
+  </div>
+
+  <div class="flex flex-1 items-center justify-end gap-2 sm:gap-3">
+    <div class="relative hidden max-w-xs flex-1 md:block">
+      <span class="material-icons absolute left-3 top-1/2 -translate-y-1/2 text-lg text-slate-500">search</span>
+      <input
+        type="search"
+        class="input-field !py-2 !pl-10 !text-sm"
+        placeholder="Search campaigns, reports..."
+        aria-label="Search"
+      />
+    </div>
+
+    <button type="button" class="btn-secondary !p-2" aria-label="Notifications">
+      <span class="material-icons text-xl">notifications_none</span>
+    </button>
+
+    <button
+      type="button"
+      class="btn-secondary !p-2"
+      (click)="theme.toggle()"
+      aria-label="Toggle theme"
+    >
+      <span class="material-icons text-xl">dark_mode</span>
+    </button>
+
+    <button type="button" class="flex items-center gap-2 rounded-xl border border-white/10 bg-surface-3 px-2 py-1.5 transition hover:border-white/20" aria-label="Profile menu">
+      <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-brand to-cyan-500 text-xs font-bold text-white">
+        CM
+      </div>
+      <span class="material-icons hidden text-slate-400 sm:inline">expand_more</span>
+    </button>
+  </div>
+</header>

@@ -1,0 +1,51 @@
+services:
+
+  backend:
+    build:
+      context: ./ai-marketing-backend
+    container_name: ai_backend
+    ports:
+      - "3000:3000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      OPENCLAW_GATEWAY_URL: http://host.docker.internal:18789
+      OPENCLAW_GATEWAY_TOKEN: 7c06b12b59bcb31526b229bae7c1443d055dab22d8ef34d3
+    command: node index.js
+    depends_on:
+      - redis
+
+
+  worker:
+    build:
+      context: ./ai-marketing-backend
+    container_name: ai_worker
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      OPENCLAW_GATEWAY_URL: http://host.docker.internal:18789
+      OPENCLAW_GATEWAY_TOKEN: 7c06b12b59bcb31526b229bae7c1443d055dab22d8ef34d3
+    command: node worker.js
+    depends_on:
+      - redis
+
+
+  redis:
+    image: redis:7-alpine
+    container_name: ai_redis
+    ports:
+      - "6379:6379"
+
+
+  frontend:
+    build:
+      context: ./ai-marketing-frontend
+    container_name: ai_frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend

@@ -1,0 +1,124 @@
+ <div class="page-container animate-fade-in">
+      <h1 class="mb-6 text-2xl font-bold text-white">Campaign History</h1>
+      @if (items.length === 0) {
+        <app-empty-state icon="history" title="No history yet" description="Your generated campaigns and analyses will appear here." />
+      } @else {
+        <div class="space-y-3">
+          @for (item of items; track item.id) {
+            <div class="glass-card p-5">
+              <div class="flex items-center justify-between">
+                <span class="rounded-full bg-brand/10 px-2.5 py-0.5 text-xs font-medium text-brand">{{ item.type }}</span>
+                <span class="text-xs text-slate-500">{{ item.createdAt | date: 'medium' }}</span>
+              </div>
+              <p class="mt-2 font-medium text-white">{{ item.title }}</p>
+              <p class="mt-1 text-sm text-slate-400">{{ item.preview }}</p>
+              <div class="mt-3 flex gap-2">
+                <button class="btn-secondary" (click)="onShowDetails(item)">Show Details</button>
+                @if (item.campaignId) {
+                  <button class="btn-secondary" (click)="onDelete(item)">Delete</button>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Modal -->
+      @if (selectedItem()) {
+        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+          <div class="glass-panel max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl p-8">
+            <!-- Modal Header -->
+            <div class="mb-6 flex items-center justify-between">
+              <h2 class="text-xl font-bold text-white">{{ selectedItem()!.title }}</h2>
+              <button (click)="selectedItem.set(null)" class="text-slate-400 hover:text-white">
+                <span class="material-icons">close</span>
+              </button>
+            </div>
+
+            <!-- Campaign Details -->
+            <div class="space-y-4 text-slate-300">
+              @if (campaignData()?.overview) {
+                <div>
+                  <h3 class="mb-2 font-semibold text-white">Overview</h3>
+                  <p class="whitespace-pre-wrap">{{ campaignData()!.overview }}</p>
+                </div>
+              }
+
+              @if (campaignData()?.strategy) {
+                <div>
+                  <h3 class="mb-2 font-semibold text-white">Strategy</h3>
+                  <p class="whitespace-pre-wrap">{{ campaignData()!.strategy }}</p>
+                </div>
+              }
+
+              @if (campaignData()?.socialPosts?.length) {
+                <div>
+                  <h3 class="mb-2 font-semibold text-white">Social Posts</h3>
+                  <ul class="space-y-2 text-sm">
+                    @for (post of campaignData()!.socialPosts; track $index) {
+                      <li class="rounded bg-surface-3/40 p-2">
+                        <span class="font-medium">{{ post.platform || 'Post' }}</span>: {{ post.content }}
+                      </li>
+                    }
+                  </ul>
+                </div>
+              }
+
+              @if (campaignData()?.emailCampaign) {
+                <div>
+                  <h3 class="mb-2 font-semibold text-white">Email Campaign</h3>
+                  <p class="whitespace-pre-wrap">{{ campaignData()!.emailCampaign }}</p>
+                </div>
+              }
+
+              @if (campaignData()?.contentCalendar?.length) {
+                <div>
+                  <h3 class="mb-2 font-semibold text-white">Content Calendar</h3>
+                  <ul class="space-y-1 text-sm">
+                    @for (entry of campaignData()!.contentCalendar; track $index) {
+                      <li>Day {{ entry.day }}: {{ entry.action }}</li>
+                    }
+                  </ul>
+                </div>
+              }
+
+              @if (campaignData()?.hashtags?.length) {
+                <div>
+                  <h3 class="mb-2 font-semibold text-white">Hashtags</h3>
+                  <div class="flex flex-wrap gap-2">
+                    @for (tag of campaignData()!.hashtags; track $index) {
+                      <span class="rounded bg-brand/20 px-3 py-1 text-xs text-brand">{{ tag }}</span>
+                    }
+                  </div>
+                </div>
+              }
+
+              @if (campaignData()?.cta) {
+                <div>
+                  <h3 class="mb-2 font-semibold text-white">Call To Action</h3>
+                  <p>{{ campaignData()!.cta }}</p>
+                </div>
+              }
+            </div>
+
+            <!-- Modal Actions -->
+            <div class="mt-8 flex gap-3 border-t border-white/[0.08] pt-6">
+              @if (selectedItem()!.campaignId) {
+                <button class="btn-primary" (click)="onResend(selectedItem()!)">
+                  Resend
+                </button>
+                <button class="btn-secondary" (click)="onCancel(selectedItem()!)">
+                  Cancel
+                </button>
+              }
+              <button class="btn-secondary" (click)="onDelete(selectedItem()!)">
+                Delete
+              </button>
+              <button class="ml-auto btn-secondary" (click)="selectedItem.set(null)">
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
