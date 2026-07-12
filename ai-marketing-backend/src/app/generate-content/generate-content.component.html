@@ -1,0 +1,24 @@
+<textarea
+  [(ngModel)]="prompt"
+  rows="5">
+</textarea>
+
+<button (click)="generateCampaign()">
+  Generate Campaign
+</button>
+
+<hr>
+
+<div *ngIf="generatedText">
+
+  <pre class="generated-text">{{ generatedText }}</pre>
+
+  <button (click)="activateCampaign()">
+    Activate
+  </button>
+
+  <button (click)="cancelCampaign()">
+    Cancel
+  </button>
+
+</div>

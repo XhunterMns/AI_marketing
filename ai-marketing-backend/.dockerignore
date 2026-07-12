@@ -1,0 +1,58 @@
+# Files / dirs not needed inside the backend Docker image.
+# Keeps the image small and prevents host secrets from leaking into the image.
+
+# Git / VCS
+.git
+.gitignore
+.gitattributes
+
+# Local artifacts
+node_modules
+dist
+out-tsc
+.bazel-out
+coverage
+
+# Env files (use docker-compose env_file / Docker secrets instead)
+.env
+.env.local
+.env.*.local
+
+# Editor / IDE
+.vscode
+.idea
+.history
+.cursor
+.agents
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Docs / screenshots / demo files that bloat the image
+*.md
+README.md
+ARCHITECTURE.md
+docker-compose.yml
+Dockerfile
+Dockerfile.worker
+
+# The Angular workspace lives in a subfolder; not needed by the backend image
+ai-marketing-frontend
+
+# Local openclaw config (not needed by the backend)
+openclaw
+
+# The legacy / unused files
+server.js
+server.ts
+tsconfig.app.json
+tsconfig.json
+tsconfig.spec.json
+angular.json
