@@ -74,22 +74,27 @@ const formatForTelegram = (result) => {
 
 const createCampaignJobs = async ({ campaignId, jobs, botToken, chatId }) => {
   if (!campaignId) throw new Error('campaignId is required');
-const delay = parseInt(duration , 10) *24 * 60 * 60 * 1000; 
+
+  const msPerDay = 24 * 60 * 60 * 1000;
+
   return Promise.all(
     jobs.map(async (job) => {
+      const dayNumber = Number(job.day) || 1;
+      const delayMs = Math.max(dayNumber - 1, 0) * msPerDay;
+
       const queued = await campaignQueue.add(
         'campaign-step',
         {
           campaignId,
-          day: job.day,
+          day: dayNumber,
           message: job.message,
           botToken,
           chatId,
         },
-        { delay: (job.day || 1) * delay } 
+        { delay: delayMs }
       );
 
-      return { id: queued.id, day: job.day };
+      return { id: queued.id, day: dayNumber };
     })
   );
 };
