@@ -9,7 +9,7 @@ export class CompetitorAnalysisService {
   constructor(private http: HttpClient) { }
 
   // See campaign.service.ts for why this is a relative URL.
-  baseUrl = '/api';
+  baseUrl = '';
   competitorAnalysis(prompt: string): any {
     return this.http.post(`${this.baseUrl}/competitor-analysis`, { prompt });
   }
