@@ -55,7 +55,7 @@ export class CampaignService {
 @Injectable({ providedIn: 'root' })
 export class CompetitorAnalysisService {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = '';
+  private readonly baseUrl = '/api';
 
   analyze(payload: CompetitorAnalysisRequest): Observable<{ result: string | CompetitorAnalysisResult }> {
     return this.http.post<{ result: string | CompetitorAnalysisResult }>(
