@@ -94,7 +94,7 @@ const createCampaignJobs = async ({ campaignId, jobs, botToken, chatId }) => {
         { delay: delayMs }
       );
 
-      return { id: queued.id, day: dayNumber };
+      return { id: queued.id, day: dayNumber }
     })
   );
 };
