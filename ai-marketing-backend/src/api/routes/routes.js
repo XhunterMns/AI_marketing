@@ -11,6 +11,8 @@ module.exports = (app) => {
   router.post("/campaigns/:campaignId/approve", campaignController.approveCampaign);
   router.post("/campaigns/:campaignId/decline", campaignController.declineCampaign);
   router.post("/campaigns/:campaignId/cancel", campaignController.cancelCampaign);
+  router.get("/campaigns/history", campaignController.getCampaignHistory);
+  router.delete("/campaigns/history/:campaignId", campaignController.deleteCampaignHistoryItem);
   router.post("/competitor-analysis", analysisController.competitorAnalysis);
   router.post("/meta/post", metaController.postToMeta);
   router.post("/telegram/send", postingController.sendPostToTelegram);
@@ -21,6 +23,8 @@ module.exports = (app) => {
   app.post("/campaigns/:campaignId/approve", campaignController.approveCampaign);
   app.post("/campaigns/:campaignId/decline", campaignController.declineCampaign);
   app.post("/campaigns/:campaignId/cancel", campaignController.cancelCampaign);
+  app.get("/campaigns/history", campaignController.getCampaignHistory);
+  app.delete("/campaigns/history/:campaignId", campaignController.deleteCampaignHistoryItem);
   app.post("/competitor-analysis", analysisController.competitorAnalysis);
   app.post("/meta/post", metaController.postToMeta); //facebook page ama lmochkla yelzm bussniss verification
   app.post("/telegram/send", postingController.sendPostToTelegram);

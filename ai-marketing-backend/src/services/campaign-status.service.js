@@ -48,6 +48,28 @@ const setCampaignData = async (campaignId, data) => {
   await redis.set(getCampaignDataKey(campaignId), JSON.stringify(data));
 };
 
+const CAMPAIGN_HISTORY_KEY = 'campaign:history';
+
+const addCampaignToHistory = async (campaignId) => {
+  if (!campaignId) throw new Error('campaignId is required');
+
+  await redis
+    .multi()
+    .lrem(CAMPAIGN_HISTORY_KEY, 0, campaignId)
+    .lpush(CAMPAIGN_HISTORY_KEY, campaignId)
+    .ltrim(CAMPAIGN_HISTORY_KEY, 0, 49)
+    .exec();
+};
+
+const getCampaignHistoryIds = async () => {
+  return redis.lrange(CAMPAIGN_HISTORY_KEY, 0, 49);
+};
+
+const removeCampaignFromHistory = async (campaignId) => {
+  if (!campaignId) return;
+  await redis.lrem(CAMPAIGN_HISTORY_KEY, 0, campaignId);
+};
+
 const getCampaignData = async (campaignId) => {
   if (!campaignId) return null;
   const raw = await redis.get(getCampaignDataKey(campaignId));
@@ -73,4 +95,7 @@ module.exports = {
   setCampaignData,
   getCampaignData,
   deleteCampaignData,
+  addCampaignToHistory,
+  getCampaignHistoryIds,
+  removeCampaignFromHistory,
 };

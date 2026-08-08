@@ -52,11 +52,11 @@
     </div>
   </div>
 
-  @if (history.length) {
+  @if (history().length) {
     <div class="mt-6 glass-card p-6">
       <h2 class="mb-4 text-lg font-semibold text-white">Recent Campaigns</h2>
       <div class="space-y-3">
-        @for (item of history; track item.id) {
+        @for (item of history(); track item.id) {
           <div class="rounded-xl border border-white/[0.06] bg-surface-3/50 p-4">
             <p class="font-medium text-slate-200">{{ item.title }}</p>
             <p class="mt-1 line-clamp-2 text-sm text-slate-500">{{ item.preview }}</p>

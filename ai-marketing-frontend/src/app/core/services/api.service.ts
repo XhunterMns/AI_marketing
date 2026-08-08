@@ -5,6 +5,7 @@ import {
   CampaignApiResponse,
   CampaignRequest,
   CampaignResult,
+  HistoryItem,
   CompetitorAnalysisRequest,
   CompetitorAnalysisResult,
 } from '../models';
@@ -28,6 +29,14 @@ export class CampaignService {
 
   cancelCampaign(campaignId: string): Observable<{ success: boolean }> {
     return this.http.post<{ success: boolean }>(`${this.baseUrl}/campaigns/${campaignId}/cancel`, {});
+  }
+
+  getHistory(): Observable<HistoryItem[]> {
+    return this.http.get<HistoryItem[]>(`${this.baseUrl}/campaigns/history`);
+  }
+
+  deleteHistoryItem(campaignId: string): Observable<{ success: boolean }> {
+    return this.http.delete<{ success: boolean }>(`${this.baseUrl}/campaigns/history/${campaignId}`);
   }
 
   sendToTelegram(message: string, botToken: string, channelId: string): Observable<{ success: boolean }> {

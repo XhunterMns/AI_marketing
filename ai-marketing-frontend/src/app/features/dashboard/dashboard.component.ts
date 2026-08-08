@@ -1,8 +1,10 @@
 import { DatePipe } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { StatCardComponent } from '../../shared/components/stat-card/stat-card.component';
 import { DashboardService } from '../../core/services/dashboard.service';
+import { CampaignService } from '../../core/services/api.service';
+import { HistoryItem } from '../../core/models';
 
 @Component({
   selector: 'app-dashboard',
@@ -11,9 +13,17 @@ import { DashboardService } from '../../core/services/dashboard.service';
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
 })
-export class DashboardComponent {
-  readonly dashboard = inject(DashboardService);
+export class DashboardComponent implements OnInit {
+  private readonly dashboard = inject(DashboardService);
+  private readonly campaignService = inject(CampaignService);
   readonly stats = this.dashboard.stats;
   readonly activity = this.dashboard.recentActivity;
-  readonly history = this.dashboard.getHistory().slice(0, 5);
+  readonly history = signal<HistoryItem[]>([]);
+
+  ngOnInit(): void {
+    this.campaignService.getHistory().subscribe({
+      next: (history) => this.history.set(history.slice(0, 5)),
+      error: () => {},
+    });
+  }
 }

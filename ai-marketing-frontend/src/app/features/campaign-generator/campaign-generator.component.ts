@@ -123,17 +123,7 @@ export class CampaignGeneratorComponent implements OnInit, OnDestroy {
           title: parsed.title || v.businessName,
           timestamp: new Date(),
           status: 'success',
-        });
-        this.dashboard.saveHistory({
-          id: crypto.randomUUID(),
-          type: 'campaign',
-          title: parsed.title || v.businessName,
-          createdAt: new Date().toISOString(),
-          preview: parsed.overview || parsed.strategy || v.prompt.slice(0, 120),
-          campaignId: res?.campaignId || '',
-          result: parsed
-        });
-        this.notifications.success('Campaign generated successfully!');
+        });        this.notifications.success('Campaign generated successfully!');
       },
       error: () => this.loading.set(false),
             

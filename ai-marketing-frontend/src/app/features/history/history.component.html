@@ -1,10 +1,12 @@
  <div class="page-container animate-fade-in">
       <h1 class="mb-6 text-2xl font-bold text-white">Campaign History</h1>
-      @if (items.length === 0) {
+      @if (loading()) {
+        <p class="text-sm text-slate-400">Loading campaign history...</p>
+      } @else if (items().length === 0) {
         <app-empty-state icon="history" title="No history yet" description="Your generated campaigns and analyses will appear here." />
       } @else {
         <div class="space-y-3">
-          @for (item of items; track item.id) {
+          @for (item of items(); track item.id) {
             <div class="glass-card p-5">
               <div class="flex items-center justify-between">
                 <span class="rounded-full bg-brand/10 px-2.5 py-0.5 text-xs font-medium text-brand">{{ item.type }}</span>

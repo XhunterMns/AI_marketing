@@ -1,10 +1,9 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
-import { DashboardService } from '../../core/services/dashboard.service';
-import { EmptyStateComponent } from '../../shared/components/empty-state/empty-state.component';
-import { CampaignService } from '../../core/services/api.service';
-import { NotificationService } from '../../core/services/notification.service';
 import { HistoryItem, CampaignResult } from '../../core/models';
+import { CampaignService } from '../../core/services/api.service';
+import { EmptyStateComponent } from '../../shared/components/empty-state/empty-state.component';
+import { NotificationService } from '../../core/services/notification.service';
 
 @Component({
   selector: 'app-history',
@@ -12,12 +11,12 @@ import { HistoryItem, CampaignResult } from '../../core/models';
   imports: [CommonModule, DatePipe, EmptyStateComponent],
   templateUrl: './history.component.html',
 })
-export class HistoryComponent {
-  private readonly dashboard = inject(DashboardService);
+export class HistoryComponent implements OnInit {
   private readonly campaignService = inject(CampaignService);
   private readonly notifications = inject(NotificationService);
 
-  readonly items = this.dashboard.getHistory();
+  readonly items = signal<HistoryItem[]>([]);
+  readonly loading = signal(false);
   readonly selectedItem = signal<HistoryItem | null>(null);
 
   readonly campaignData = computed(() => {
@@ -25,6 +24,19 @@ export class HistoryComponent {
     if (!item?.result) return null;
     return item.result as CampaignResult;
   });
+
+  ngOnInit(): void {
+    this.loadHistory();
+  }
+
+  private loadHistory(): void {
+    this.loading.set(true);
+    this.campaignService.getHistory().subscribe({
+      next: (history) => this.items.set(history),
+      error: () => this.notifications.error('Failed to load campaign history'),
+      complete: () => this.loading.set(false),
+    });
+  }
 
   onShowDetails(item: HistoryItem): void {
     this.selectedItem.set(item);
@@ -42,26 +54,37 @@ export class HistoryComponent {
   }
 
   onCancel(item: HistoryItem): void {
-    if (!item?.campaignId) return;
-    this.campaignService.cancelCampaign(item.campaignId).subscribe({
+    const campaignId = item?.campaignId;
+    if (!campaignId) return;
+    this.campaignService.cancelCampaign(campaignId).subscribe({
       next: () => {
-        this.notifications.success('Campaign cancelled');
-        if (item.campaignId) {
-          this.dashboard.removeHistoryByCampaignId(item.campaignId);
-        }
-        this.selectedItem.set(null);
-        window.location.reload();
+        this.campaignService.deleteHistoryItem(campaignId).subscribe({
+          next: () => {
+            this.notifications.success('Campaign cancelled');
+            this.deleteHistoryEntry(campaignId);
+            this.selectedItem.set(null);
+          },
+          error: () => this.notifications.error('Campaign cancelled, but failed to update history'),
+        });
       },
       error: () => this.notifications.error('Failed to cancel campaign'),
     });
   }
 
   onDelete(item: HistoryItem): void {
-    if (item.campaignId) {
-      this.dashboard.removeHistoryByCampaignId(item.campaignId);
-    }
-    this.notifications.success('Campaign removed from history');
-    this.selectedItem.set(null);
-    window.location.reload();
+    const campaignId = item?.campaignId;
+    if (!campaignId) return;
+    this.campaignService.deleteHistoryItem(campaignId).subscribe({
+      next: () => {
+        this.notifications.success('Campaign removed from history');
+        this.deleteHistoryEntry(campaignId);
+        this.selectedItem.set(null);
+      },
+      error: () => this.notifications.error('Failed to remove campaign from history'),
+    });
+  }
+
+  private deleteHistoryEntry(campaignId: string): void {
+    this.items.update((items) => items.filter((item) => item.campaignId !== campaignId));
   }
 }

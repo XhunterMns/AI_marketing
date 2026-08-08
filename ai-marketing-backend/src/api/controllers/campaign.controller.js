@@ -1,6 +1,15 @@
 const { callOpenClaw } = require("../../utils/openclaw.utils");
 const campaignQueue = require("../../../queue");
-const { setCampaignStatus, STATUS } = require("../../services/campaign-status.service");
+const {
+  setCampaignStatus,
+  STATUS,
+  setCampaignData,
+  getCampaignData,
+  getCampaignStatus,
+  addCampaignToHistory,
+  getCampaignHistoryIds,
+  removeCampaignFromHistory,
+} = require('../../services/campaign-status.service');
 const crypto = require('crypto');
 
 const stripCodeFences = (text) => {
@@ -99,8 +108,6 @@ const createCampaignJobs = async ({ campaignId, jobs, botToken, chatId }) => {
   );
 };
 
-const { setCampaignData, getCampaignData, deleteCampaignData } = require('../../services/campaign-status.service');
-
 exports.generateCampaign = async (req, res) => {
   const { prompt, telegram } = req.body;
 
@@ -124,7 +131,12 @@ exports.generateCampaign = async (req, res) => {
     const campaignId = crypto.randomUUID();
 
     await setCampaignStatus(campaignId, STATUS.PENDING);
-    await setCampaignData(campaignId, { result, telegram });
+    await setCampaignData(campaignId, {
+      result,
+      telegram,
+      createdAt: new Date().toISOString(),
+    });
+    await addCampaignToHistory(campaignId);
 
     return res.json({ result, campaignId });
   } catch (error) {
@@ -201,5 +213,51 @@ exports.cancelCampaign = async (req, res) => {
     return res.json({ success: true, campaignId, status: STATUS.CANCELLED });
   } catch (error) {
     return res.status(400).json({ error: error.message });
+  }
+};
+
+exports.getCampaignHistory = async (req, res) => {
+  try {
+    const campaignIds = await getCampaignHistoryIds();
+    const history = [];
+
+    for (const campaignId of campaignIds) {
+      const data = await getCampaignData(campaignId);
+      if (!data || !data.result) continue;
+
+      const title = data.result.title || 'Campaign';
+      const preview =
+        data.result.overview ||
+        data.result.strategy ||
+        data.result.raw ||
+        title;
+      const createdAt = data.createdAt || new Date().toISOString();
+      const status = await getCampaignStatus(campaignId);
+
+      history.push({
+        id: campaignId,
+        campaignId,
+        type: 'campaign',
+        title,
+        createdAt,
+        preview,
+        result: data.result,
+        status,
+      });
+    }
+
+    return res.json(history);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+exports.deleteCampaignHistoryItem = async (req, res) => {
+  try {
+    const { campaignId } = req.params;
+    await removeCampaignFromHistory(campaignId);
+    return res.json({ success: true, campaignId });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
   }
 };
